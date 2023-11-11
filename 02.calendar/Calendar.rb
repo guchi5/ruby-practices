@@ -10,21 +10,21 @@ def createCal(year, month)
   week_list = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   f_cal = Date.new(year, month, 1)
   l_cal = Date.new(year, month, -1)
-  date_num = (l_cal-f_cal).to_i
+  day_num = (l_cal-f_cal).to_i
   space_count = week_list.index(f_cal.strftime("%a"))+1
   sat_count = 0
-  date_list = Array.new(date_num+space_count)
-  date_list.each_with_index{|value, date|
-    if space_count > date+1
-      date_list[date] = nil
+  day_list = Array.new(day_num+space_count)
+  day_list.each_with_index{|value, day|
+    if space_count > day+1
+      day_list[day] = nil
       next
     end
-    date_list[date] = (date+2)-(space_count)
-    if (f_cal + (date+1)-(space_count)).strftime("%a") == week_list[6]
+    day_list[day] = (day+2)-(space_count)
+    if (f_cal + (day+1)-(space_count)).strftime("%a") == week_list[6]
       sat_count += 1
     end
   }
-  return [[f_cal.year, f_cal.month, sat_count], date_list]
+  return [[f_cal.year, f_cal.month, sat_count], day_list]
 
 end
 
@@ -32,7 +32,7 @@ def showCal(cal_list)
   cal = Date.new(cal_list[0][0], cal_list[0][1], 1)
   sat_count = cal_list[0][2]
   today = Date.today
-  date_list = cal_list[1]
+  day_list = cal_list[1]
   header = cal.strftime('%B')+"\s"+cal.strftime("%Y")
 
   for i in 0..(((20-(header.length))/2)-1)
@@ -41,18 +41,18 @@ def showCal(cal_list)
   print(header)
   print("\n")
   puts("Su Mo Tu We Th Fr Sa")
-  date_list.each_with_index{|date, index|
-    if(date==nil)
+  day_list.each_with_index{|day, index|
+    if(day==nil)
       print("\s\s\s")
       next
     end
-    if(date<10)
+    if(day<10)
       print("\s")
     end
-    if (date == today.day && cal_list[0][0]==today.year && cal_list[0][1]==today.month)
-      print("\e[7m#{date}\e[0m\s")
+    if (day == today.day && cal_list[0][0]==today.year && cal_list[0][1]==today.month)
+      print("\e[7m#{day}\e[0m\s")
     else
-      printf("%d\s", date)
+      printf("%d\s", day)
     end
     if((index+1)%WEEK_NUM == 0)
       print("\n")
