@@ -11,24 +11,35 @@ def createCal(year, month)
   f_cal = Date.new(year, month, 1)
   l_cal = Date.new(year, month, -1)
   date_num = (l_cal-f_cal).to_i
-  space_cont = week_list.index(f_cal.strftime("%a"))+1
-
-  date_list = Array.new(date_num+space_cont)
+  space_count = week_list.index(f_cal.strftime("%a"))+1
+  sat_count = 0
+  date_list = Array.new(date_num+space_count)
   date_list.each_with_index{|value, date|
-    if space_cont > date+1
+    if space_count > date+1
       date_list[date] = nil
       next
     end
-    date_list[date] = (date+2)-(space_cont)
+    date_list[date] = (date+2)-(space_count)
+    if (f_cal + (date+1)-(space_count)).strftime("%a") == week_list[6]
+      sat_count += 1
+    end
   }
-  return [[f_cal.year, f_cal.month], date_list]
+  return [[f_cal.year, f_cal.month, sat_count], date_list]
 
 end
 
 def showCal(cal_list)
   cal = Date.new(cal_list[0][0], cal_list[0][1], 1)
+  sat_count = cal_list[0][2]
+  today = Date.today
   date_list = cal_list[1]
-  puts("\s\s\s"+cal.strftime('%B')+"\s"+cal.strftime("%Y"))
+  header = cal.strftime('%B')+"\s"+cal.strftime("%Y")
+
+  for i in 0..(((20-(header.length))/2)-1)
+    print("\s")
+  end
+  print(header)
+  print("\n")
   puts("Su Mo Tu We Th Fr Sa")
   date_list.each_with_index{|date, index|
     if(date==nil)
@@ -38,12 +49,19 @@ def showCal(cal_list)
     if(date<10)
       print("\s")
     end
-    printf("%d\s", date)
+    if (date == today.day && cal_list[0][0]==today.year && cal_list[0][1]==today.month)
+      print("\e[7m#{date}\e[0m\s")
+    else
+      printf("%d\s", date)
+    end
     if((index+1)%WEEK_NUM == 0)
       print("\n")
     end
   }
-  print("\n\n")
+  if(sat_count < 5)
+    print("\n")
+  end
+  print("\n")
 end
 
 params = ARGV.getopts("m:", "y:")
