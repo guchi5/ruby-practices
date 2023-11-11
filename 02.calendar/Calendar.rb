@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'optparse'
 require 'date'
 
@@ -41,7 +43,7 @@ def showCal(cal_list)
       print("\n")
     end
   }
-  print("\n")
+  print("\n\n")
 end
 
 params = ARGV.getopts("m:", "y:")
