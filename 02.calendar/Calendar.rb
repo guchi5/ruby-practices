@@ -50,7 +50,7 @@ def show_cal(cal, today)
       print "\n"
     end
   end
-  if (week_count < CALENDAR_ROW)
+  if (week_count < CALENDAR_ROW-1)
     print "\n"
   end
   print "\n"
