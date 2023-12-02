@@ -4,74 +4,60 @@ require 'optparse'
 require 'date'
 
 WEEK_NUM = 7
-MONTH_NUM = 12
 
 def create_cal(year, month)
-  week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-  f_cal = Date.new(year, month, 1)
-  l_cal = Date.new(year, month, -1)
-  day_num = (l_cal - f_cal).to_i
-  space_count = week.index(f_cal.strftime("%a"))+1
-  sat_count = 0
-  day_list = Array.new(day_num + space_count)
-  day_list.each_with_index do |value, day|
+  first_day = Date.new(year, month, 1)
+  last_day = Date.new(year, month, -1)
+  day_num = (last_day - first_day).to_i
+  space_count = (first_day.wday + 1).to_i
+  days = Array.new(day_num + space_count)
+  days.each_with_index do |value, day|
     if space_count > day+1
       next
     end
-    day_list[day] = (day + 2) - space_count
-    if (f_cal + (day + 1) - (space_count)).strftime("%a") == week[6]
-      sat_count += 1
-    end
+    days[day] = (day + 2) - space_count
   end
-  return [[f_cal.year, f_cal.month, sat_count], day_list]
+  return {year: first_day.year, month: first_day.month, days: days}
 end
 
-def show_cal(cal_list)
-  cal = Date.new(cal_list[0][0], cal_list[0][1], 1)
-  sat_count = cal_list[0][2]
-  today = Date.today
-  day_list = cal_list[1]
-  header = cal.strftime('%B') + "\s" + cal.strftime("%Y")
+def show_cal(cal, today)
+  days = cal[:days]
+  year = cal[:year]
+  month = cal[:month]
+  first_day = Date.new(year, month, 1)
+  week_count = 0
+  entire_week = "Su Mo Tu We Th Fr Sa"
+  header = first_day.strftime('%B') + "\s" + first_day.strftime("%Y")
 
-  for i in 0..(((20 - (header.length)) / 2) - 1)
-    print("\s")
-  end
-  print(header)
-  print("\n")
-  puts("Su Mo Tu We Th Fr Sa")
-  day_list.each_with_index do |day, index|
-    if (day==nil)
-      print("\s\s\s")
+  puts header.center(entire_week.length)
+  puts entire_week
+  days.each_with_index do |day, index|
+    if (day == nil)
+      print "\s\s\s"
       next
     end
-    if (day<10)
-      print("\s")
+    if (day < 10)
+      print "\s"
     end
-    if (day == today.day && cal_list[0][0] == today.year && cal_list[0][1] == today.month)
+    if (day == today.day && year == today.year && month == today.month)
       print("\e[7m#{day}\e[0m\s")
     else
       printf("%d\s", day)
     end
     if ((index + 1) % WEEK_NUM == 0)
-      print("\n")
+      week_count += 1
+      print "\n"
     end
   end
-  if (sat_count < 5)
-    print("\n")
+  if (week_count < 5)
+    print "\n"
   end
-  print("\n")
+  print "\n"
 end
 
+today = Date.today
 params = ARGV.getopts("m:", "y:")
-year = params["y"]
-month = params["m"]
-if (year == nil)
-  year = Date.today.year
-end
-if (month == nil)
-  month = Date.today.month
-end
-year = year.to_i
-month = month.to_i
+year = ((params["y"]==nil) ? today.year : params["y"]).to_i
+month = ((params["m"]==nil) ? today.month : params["m"]).to_i
 cal = create_cal(year, month)
-show_cal(cal)
+show_cal(cal, today)
