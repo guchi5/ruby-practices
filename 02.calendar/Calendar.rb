@@ -4,6 +4,7 @@ require 'optparse'
 require 'date'
 
 WEEK_NUM = 7
+CALENDAR_ROW = 6
 
 def create_cal(year, month)
   first_day = Date.new(year, month, 1)
@@ -49,7 +50,7 @@ def show_cal(cal, today)
       print "\n"
     end
   end
-  if (week_count < 5)
+  if (week_count < CALENDAR_ROW)
     print "\n"
   end
   print "\n"
