@@ -13,18 +13,13 @@ def create_cal(year, month)
   space_count = (first_day.wday + 1).to_i
   days = Array.new(day_num + space_count)
   days.each_with_index do |value, day|
-    if space_count > day+1
-      next
-    end
+    next if space_count > (day + 1)
     days[day] = (day + 2) - space_count
   end
-  return {year: first_day.year, month: first_day.month, days: days}
+  days
 end
 
-def show_cal(cal, today)
-  days = cal[:days]
-  year = cal[:year]
-  month = cal[:month]
+def show_cal(days, year, month, today)
   first_day = Date.new(year, month, 1)
   week_count = 0
   entire_week = "Su Mo Tu We Th Fr Sa"
@@ -33,7 +28,7 @@ def show_cal(cal, today)
   puts header.center(entire_week.length)
   puts entire_week
   days.each_with_index do |day, index|
-    if (day == nil)
+    if (day.nil?)
       print "\s\s\s"
       next
     end
@@ -58,7 +53,7 @@ end
 
 today = Date.today
 params = ARGV.getopts("m:", "y:")
-year = ((params["y"]==nil) ? today.year : params["y"]).to_i
-month = ((params["m"]==nil) ? today.month : params["m"]).to_i
-cal = create_cal(year, month)
-show_cal(cal, today)
+year = params["y"]&.to_i || today.year
+month = params["m"]&.to_i || today.month
+days = create_cal(year, month)
+show_cal(days, year, month, today)
