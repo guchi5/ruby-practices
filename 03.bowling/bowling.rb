@@ -3,22 +3,22 @@
 
 # フレーム単位のリストを返す
 def create_frames
-  input = ARGV[0].split(',')
+  scores = ARGV[0].split(',')
   frames = [] # フレーム単位のリスト
 
-  while input.length.positive?
+  while scores.length.positive?
     # 10回目は全ての得点を代入して終了
     if frames.length == 9
-      frames << input.dup
+      frames << scores.dup
       break
     end
 
     frame = []
-    frame << input.shift
+    frame << scores.shift
     frame << if frame[0] == 'X'
                '0'
              else
-               input.shift
+               scores.shift
              end
     frames << frame
   end
