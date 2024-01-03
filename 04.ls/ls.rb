@@ -31,7 +31,7 @@ end
 opt = OptionParser.new
 
 all_option = false
-opt.on('-a', '--all') { |v| all_option = v }
+opt.on('-a') { |v| all_option = v }
 opt.parse!(ARGV)
 
 path = ARGV[0]&.to_s || '.'
