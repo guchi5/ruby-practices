@@ -31,12 +31,15 @@ end
 opt = OptionParser.new
 
 all_option = false
+reverse_option = false
 opt.on('-a') { |v| all_option = v }
+opt.on('-r') { |v| reverse_option = v }
 opt.parse!(ARGV)
 
 path = ARGV[0]&.to_s || '.'
 files = Dir.entries(path).sort
 files = files.reject { |file| file.start_with?('.') } if !all_option
+files.reverse! if reverse_option
 
 return if files.empty?
 
