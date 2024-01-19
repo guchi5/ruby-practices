@@ -112,7 +112,6 @@ opt = OptionParser.new
 all_option = false
 reverse_option = false
 long_option = false
-col_size = MAX_COL_SIZE
 
 opt.on('-a') { |v| all_option = v }
 opt.on('-r') { |v| reverse_option = v }
@@ -125,13 +124,12 @@ files = files.reject { |file| file.start_with?('.') } if !all_option
 files.reverse! if reverse_option
 return if files.empty?
 
-total_files_num = 0
+total_file_blocks = 0
 if long_option
   file_attributes = files.map do |file|
     absolute_path = "#{File.expand_path(path, '.')}/#{file}"
-    total_files_num += File.stat(absolute_path).blocks / 2
-    status = File.stat(absolute_path).mode.to_s(8)
-    status = format('%06d', status.to_i)
+    total_file_blocks += File.stat(absolute_path).blocks / 2
+    status = format('%06d', File.stat(absolute_path).mode.to_s(8))
     show_status = convert_file_mode(status, file)
     hard_link_num = File.stat(absolute_path).nlink.to_s
     user_name = Etc.getpwuid(File.stat(absolute_path).uid).name
@@ -141,10 +139,10 @@ if long_option
     file += " -> #{File.readlink(absolute_path)}" if File.symlink?(absolute_path)
     [show_status, hard_link_num, user_name, group_name, size, date, file]
   end
-  puts "total #{total_files_num}"
+  puts "total #{total_file_blocks}"
   file_attributes = file_attributes.transpose.flatten
   show_detail_files(create_matrix_for_long_option(file_attributes, COL_SIZE_FOR_DETAIL))
-  return
+  exit
 end
-matrix = create_matrix(files, col_size)
+matrix = create_matrix(files, MAX_COL_SIZE)
 show_files(matrix)
