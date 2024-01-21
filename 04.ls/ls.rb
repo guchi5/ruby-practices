@@ -50,20 +50,20 @@ end
 def create_matrix_for_long_option(files, max_col_size)
   matrix = []
   row_size = files.length / max_col_size
-  files.each_slice(row_size) do |col|
+  files.each_slice(row_size).with_index do |(*col), index|
     valid_col = col.compact
     max_size = valid_col.max_by(&:length).length
-    matrix.push({ col: valid_col, size: max_size })
+    left_flag = true if [2, 3, 6].include?(index)
+    matrix.push({ col: valid_col, left_flag:, size: max_size })
   end
   matrix
 end
 
 # ロングオプション用のファイル表示
 def show_detail_files(matrix)
-  col_detail = { user: 2, group: 3, file: matrix.length - 1 } # 左寄せ表示させる列
   matrix[0][:col].length.times do |i|
-    matrix.each_with_index do |value, j|
-      if j == col_detail[:user] || j == col_detail[:group] || j == col_detail[:file]
+    matrix.each do |value|
+      if value[:left_flag]
         print value[:col][i].ljust(value[:size]) if !value[:col][i].nil?
       elsif !value[:col][i].nil?
         print value[:col][i].rjust(value[:size])
