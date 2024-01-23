@@ -49,12 +49,12 @@ end
 
 def create_matrix_for_long_option(files, max_col_size)
   matrix = []
+  col_name = %w[mode link user group file_size Date file]
   row_size = files.length / max_col_size
   files.each_slice(row_size).with_index do |(*col), index|
     valid_col = col.compact
     max_size = valid_col.max_by(&:length).length
-    left_flag = true if [2, 3, 6].include?(index)
-    matrix.push({ col: valid_col, left_flag:, size: max_size })
+    matrix.push({ col: valid_col, name: col_name[index], size: max_size })
   end
   matrix
 end
@@ -63,7 +63,7 @@ end
 def show_detail_files(matrix)
   matrix[0][:col].length.times do |i|
     matrix.each do |value|
-      if value[:left_flag]
+      if value[:name] == 'user' || value[:name] == 'group' || value[:name] == 'file'
         print value[:col][i].ljust(value[:size]) if !value[:col][i].nil?
       elsif !value[:col][i].nil?
         print value[:col][i].rjust(value[:size])
