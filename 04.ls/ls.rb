@@ -49,9 +49,11 @@ end
 
 def create_matrix_for_long_option(files, max_col_size)
   matrix = []
-  col_name = %w[mode link user group file_size Date file]
-  row_size = files.length / max_col_size
-  files.each_slice(row_size).with_index do |(*col), index|
+  col_name = files[0].keys.map!(&:to_s)
+  files_array = files.map(&:values)
+  col_value = files_array.transpose.flatten
+  row_size = col_value.length / max_col_size
+  col_value.each_slice(row_size).with_index do |(*col), index|
     valid_col = col.compact
     max_size = valid_col.max_by(&:length).length
     matrix.push({ col: valid_col, name: col_name[index], size: max_size })
@@ -137,10 +139,9 @@ if long_option
     size = File.stat(absolute_path).size.to_s
     date = File.stat(absolute_path).mtime.strftime('%b %e %R')
     file += " -> #{File.readlink(absolute_path)}" if File.symlink?(absolute_path)
-    [show_status, hard_link_num, user_name, group_name, size, date, file]
+    { mode: show_status, link: hard_link_num, user: user_name, group: group_name, size:, date:, file: }
   end
   puts "total #{total_file_blocks}"
-  file_attributes = file_attributes.transpose.flatten
   show_detail_files(create_matrix_for_long_option(file_attributes, COL_SIZE_FOR_DETAIL))
   exit
 end
