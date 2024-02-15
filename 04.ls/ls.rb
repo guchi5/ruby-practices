@@ -18,10 +18,9 @@ FILE_MODE_TABLE = {
     14 => 's'
   },
   'special_permission' => {
-    0 => nil,
-    1 => 't',
-    2 => 's',
-    4 => 's'
+    sticky: 't',
+    sgid: 's',
+    suid: 's'
   },
   'permission' => {
     0 => '---',
@@ -89,21 +88,28 @@ end
 
 # ファイルモードの数値を記号表記に変換する
 def convert_file_mode(status, file)
-  absolute_path = "#{File.expand_path(ARGV[0]&.to_s || '.', '.')}/#{file}"
   show_status = FILE_MODE_TABLE['file_type'][status[0..1].to_i].to_s
   show_status += FILE_MODE_TABLE['permission'][status[3].to_i].to_s
   show_status += FILE_MODE_TABLE['permission'][status[4].to_i].to_s
   show_status += FILE_MODE_TABLE['permission'][status[5].to_i].to_s
-  special_permission = FILE_MODE_TABLE['special_permission'][status[2].to_i].to_s
-  special_permission = special_permission.upcase if show_status[3] != 'x'
+  absolute_path = "#{File.expand_path(ARGV[0]&.to_s || '.', '.')}/#{file}"
+  update_special_permission(show_status, absolute_path)
+end
 
+def update_special_permission(show_status, absolute_path)
   if File.setuid?(absolute_path)
+    special_permission = FILE_MODE_TABLE['special_permission'][:suid]
+    special_permission = special_permission.upcase if show_status[3] != 'x'
     show_status[3] = special_permission
-
-  elsif File.setgid?(absolute_path)
+  end
+  if File.setgid?(absolute_path)
+    special_permission = FILE_MODE_TABLE['special_permission'][:sgid]
+    special_permission = special_permission.upcase if show_status[6] != 'x'
     show_status[6] = special_permission
-
-  elsif File.sticky?(absolute_path)
+  end
+  if File.sticky?(absolute_path)
+    special_permission = FILE_MODE_TABLE['special_permission'][:sticky]
+    special_permission = special_permission.upcase if show_status[9] != 'x'
     show_status[9] = special_permission
   end
   show_status
