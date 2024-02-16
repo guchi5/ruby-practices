@@ -102,16 +102,19 @@ def update_special_permission(show_status, absolute_path)
     special_permission = special_permission.upcase if show_status[3] != 'x'
     show_status[3] = special_permission
   end
+
   if File.setgid?(absolute_path)
     special_permission = FILE_MODE_TABLE['special_permission'][:sgid]
     special_permission = special_permission.upcase if show_status[6] != 'x'
     show_status[6] = special_permission
   end
+
   if File.sticky?(absolute_path)
     special_permission = FILE_MODE_TABLE['special_permission'][:sticky]
     special_permission = special_permission.upcase if show_status[9] != 'x'
     show_status[9] = special_permission
   end
+
   show_status
 end
 
@@ -133,6 +136,7 @@ files.reverse! if reverse_option
 return if files.empty?
 
 total_file_blocks = 0
+
 if long_option
   file_attributes = files.map do |file|
     absolute_path = "#{File.expand_path(path, '.')}/#{file}"
@@ -147,9 +151,11 @@ if long_option
     file += " -> #{File.readlink(absolute_path)}" if File.symlink?(absolute_path)
     { mode: show_status, link: hard_link_num, user: user_name, group: group_name, size:, date:, file: }
   end
+
   puts "total #{total_file_blocks}"
   show_detail_files(create_matrix_for_long_option(file_attributes, COL_SIZE_FOR_DETAIL))
   exit
 end
+
 matrix = create_matrix(files, MAX_COL_SIZE)
 show_files(matrix)
